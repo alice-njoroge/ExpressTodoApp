@@ -71,7 +71,8 @@ app.get('/:id', (req, res)=>{
 app.put('/:id', (req,res)=>{
    const task_id = req.params.id;
    const name = req.body.name;
-   let query= `update todos set  name = '${name}' where id = ${task_id}`;
+   const completed = req.body.completed;
+   let query= `update todos set  name = '${name}', completed = ${completed} where id = ${task_id}`;
    db.query(query, (err, result)=>{
       if (err){
           return res.status(500).json({message: "failed to update", error:err});
