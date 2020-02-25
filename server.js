@@ -80,6 +80,17 @@ app.put('/:id', (req,res)=>{
    });
 });
 
+app.delete('/:id', (req, res)=>{
+   const task_id = req.params.id;
+   const query = `delete from todos where id = ${task_id}`;
+   db.query(query, (err, result)=>{
+       if(err){
+           return res.status(500).json({message: "unable to delete", error:err})
+       }
+       return res.json({message: "deleted successfully"});
+   })
+});
+
 app.listen(port || 3030, () => {
     console.log(`the app is running on port ${port}`)
 });
