@@ -1,26 +1,61 @@
-const  express = require('express');
+const express = require('express');
 const mysql = require('mysql');
+const bodyParser = require('body-parser');
 
 const app = express();
+app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.json());
+
 const port = process.env.PORT;
 
 const db = mysql.createConnection({
-    host : 'localhost',
+    host: 'localhost',
     user: 'root',
     password: 'password',
     database: 'ExpressTodo'
 });
-db.connect((err)=>{
-    if (err){
+db.connect((err) => {
+    if (err) {
         throw err;
     }
     console.log("connected!")
-})
-global.db=db;
-
-app.get('/', (req,res)=> {
-   return res.json({message: "hello world"})
 });
-app.listen(port || 3030, ()=> {
+global.db = db;
+
+const createTables = "CREATE TABLE IF NOT EXISTS `todos` (\n" +
+    "  `id` int(5) NOT NULL AUTO_INCREMENT,\n" +
+    "`name` varchar(255) NOT NULL, \n" +
+    "`completed` tinyint default 0, \n" +
+    "  PRIMARY KEY (`id`)\n" +
+    ") ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1;"
+db.query(createTables, (err, result) => {
+    if (err) {
+        throw err;
+    }
+    console.log("tables created");
+});
+
+app.get('/', (req, res) => {
+    const query = "select * from todos order by id desc; ";
+    db.query(query, (err, result) => {
+        if (err) {
+            return res.status(500).json({message: "Server Error", error: err})
+        }
+        return res.json({data: result})
+    });
+
+});
+
+app.post('/create', (req,res)=>{
+    const name = req.body.name;
+    const  query = "insert into todos (name) values ('"+ name +"')";
+    db.query(query, (err,result)=>{
+        if (err){
+            return res.status(500).json({message: "failed", error: err});
+        }
+        return res.status(201).json({message: "Task created successfully"})
+    })
+});
+app.listen(port || 3030, () => {
     console.log(`the app is running on port ${port}`)
 });
