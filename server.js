@@ -46,6 +46,7 @@ app.get('/', (req, res) => {
 
 });
 
+// create a new list item in your todo_app
 app.post('/create', (req,res)=>{
     const name = req.body.name;
     const  query = "insert into todos (name) values ('"+ name +"')";
@@ -57,6 +58,9 @@ app.post('/create', (req,res)=>{
     })
 });
 
+/**
+ * get a single task 
+ */
 app.get('/:id', (req, res)=>{
    const task_id = req.params.id;
    const query = `select * from todos where id = ${task_id}`;
